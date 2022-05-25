@@ -12,7 +12,14 @@ VIRTUAL_HEIGHT = 243
 
 -- Initialize the game and set resolution, use virtual resolution
 function love.load()
+    
+    -- Set the texture filtering so there is no blurring effect on fonts or textures
     love.graphics.setDefaultFilter('nearest', 'nearest')
+
+    -- create font and size
+    smallFont = love.graphics.newFont('consola.ttf', 16)
+    -- Set the font
+    love.graphics.setFont(smallFont)
 
     push:setupScreen(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT, {
         fullscreen = false,
@@ -31,11 +38,17 @@ end
 -- Draw text to the window
 function love.draw()
     push:apply('start')
-    love.graphics.printf(
-        'Hello Pong!',
-        0,
-        VIRTUAL_HEIGHT / 2 - 6,
-        VIRTUAL_WIDTH,
-        'center')
+
+    -- Clear the screen resetting it to black
+    love.graphics.clear()
+
+    -- Print text at top center of screen
+    love.graphics.printf('Hello Pong!', 0, 20, VIRTUAL_WIDTH, 'center')
+
+    -- Draw the 2 player paddles and ball to the screen
+    love.graphics.rectangle('fill', 10, 30, 5, 20)
+    love.graphics.rectangle('fill', VIRTUAL_WIDTH - 10, VIRTUAL_HEIGHT - 50, 5, 20)
+    love.graphics.rectangle('fill', VIRTUAL_WIDTH / 2, VIRTUAL_HEIGHT / 2, 5, 5)
+
     push:apply('end')
 end
