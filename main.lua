@@ -11,6 +11,8 @@ function love.load()
     })
 end
 
+-- Draw text to the window
+
 function love.draw()
     love.graphics.printf(
         'Hello Pong!',
