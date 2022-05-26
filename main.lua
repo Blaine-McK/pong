@@ -28,11 +28,8 @@ function love.load()
     love.graphics.setDefaultFilter('nearest', 'nearest')
 
     -- create fonts and set sizes
-    scoreFont = love.graphics.newFont('consola.ttf', 32)
     smallFont = love.graphics.newFont('consola.ttf', 16)
-
-    -- Set the font
-    love.graphics.setFont(smallFont)
+    scoreFont = love.graphics.newFont('consola.ttf', 32)
 
     push:setupScreen(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT, {
         fullscreen = false,
@@ -48,8 +45,16 @@ function love.draw()
     -- Clear the screen resetting it to black
     love.graphics.clear()
 
-    -- Print text at top center of screen
+    -- Draw text at top center of screen
+    -- Set the font
+    love.graphics.setFont(smallFont)
     love.graphics.printf('Hello Pong!', 0, 20, VIRTUAL_WIDTH, 'center')
+
+    -- Draw player scores
+    -- Set the font
+    love.graphics.setFont(scoreFont)
+    love.graphics.print(tostring(player1Score), VIRTUAL_WIDTH / 2 - 50, VIRTUAL_HEIGHT / 3)
+    love.graphics.print(tostring(player2Score), VIRTUAL_WIDTH / 2 + 50, VIRTUAL_HEIGHT / 3)
 
     -- Draw the 2 player paddles and ball to the screen
     love.graphics.rectangle('fill', 10, player1Y, 5, 20)
