@@ -15,7 +15,10 @@ PADDLE_SPEED = 200
 
 -- Initialize the game and set resolution, use virtual resolution
 function love.load()
-    
+   
+    -- Seed the random number generator using current time
+    math.randomseed(os.time())
+
     -- Set player starting scores
     player1Score = 0
     player2Score = 0
@@ -36,6 +39,18 @@ function love.load()
         resizable = false,
         vsync = true
     })
+
+    -- Store ball position
+    ballX = VIRTUAL_WIDTH / 2 - 2
+    ballY = VIRTUAL_HEIGHT / 2 - 2
+
+    -- Store ball velocity
+    ballDX = math.random(2) == 1 and 100 or -100
+    ballDY = math.random(-50, 50)
+
+    -- Rudimentary state machine
+    gameState = 'start'
+
 end
 
 -- Draw text to the window
@@ -56,10 +71,17 @@ function love.draw()
     love.graphics.print(tostring(player1Score), VIRTUAL_WIDTH / 2 - 50, VIRTUAL_HEIGHT / 3)
     love.graphics.print(tostring(player2Score), VIRTUAL_WIDTH / 2 + 50, VIRTUAL_HEIGHT / 3)
 
+    -- Print to screen so we can see transition between states
+    if gameState == 'start' then
+        love.graphics.printf('Start!', 0, 20, VIRTUAL_WIDTH, 'center')
+    else
+        love.graphics.printf('Play!', 0, 20, VIRTUAL_WIDTH, 'center')
+    end
+
     -- Draw the 2 player paddles and ball to the screen
     love.graphics.rectangle('fill', 10, player1Y, 5, 20)
     love.graphics.rectangle('fill', VIRTUAL_WIDTH - 10, player2Y, 5, 20)
-    love.graphics.rectangle('fill', VIRTUAL_WIDTH / 2, VIRTUAL_HEIGHT / 2, 5, 5)
+    love.graphics.rectangle('fill', ballX, ballY, 4, 4)
 
     push:apply('end')
 end
@@ -70,21 +92,50 @@ function love.update(dt)
     -- Player1 movement
     if love.keyboard.isDown('w') then
         player1Y = player1Y - (PADDLE_SPEED * dt)
+        -- Prevent player1 from going off top of screen
+        player1Y = math.max(0, player1Y)
     elseif love.keyboard.isDown('s') then
         player1Y = player1Y + (PADDLE_SPEED * dt)
+        -- Prevent player1 from going off bottom of screen
+        player1Y = math.min(VIRTUAL_HEIGHT - 20, player1Y)
     end
 
     -- Player2 movement
     if love.keyboard.isDown('up') then
         player2Y = player2Y - (PADDLE_SPEED * dt)
+        -- Prevent player2 from going off top of screen
+        player2Y = math.max(0, player2Y)
     elseif love.keyboard.isDown('down') then
         player2Y = player2Y + (PADDLE_SPEED * dt)
+        -- Prevent player2 from going off bottom of screen
+        player2Y = math.min(VIRTUAL_HEIGHT - 20, player2Y)
     end
+
+    -- Ensure ball can only move in the 'play' state
+    if gameState == 'play' then
+        ballX = ballX + ballDX * dt
+        bally = ballY + ballDY * dt
+    end
+
 end
 
 -- Add a way to quit the game by user input
 function love.keypressed(key)
     if key == 'escape' then
         love.event.quit()
+    
+    -- Functionality to start game and implement ball movement
+    elseif key == 'enter' or key == 'return' then
+        if gameState == 'start' then
+            gameState = 'play'
+        else
+            gameState = 'start'
+
+            ballX = VIRTUAL_WIDTH / 2 - 2
+            ballY = VIRTUAL_HEIGHT / 2 - 2
+
+            ballDX = math.random(2) == 1 and 100 or -100
+            ballDY = math.random(-50, 50) * 1.5
+        end
     end
 end
