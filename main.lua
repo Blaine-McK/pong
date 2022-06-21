@@ -1,6 +1,11 @@
 -- Import the 'push' library
 push = require 'push'
 
+-- Import the 'class' library, this will allow us to
+-- represent anything in the game as code instead of keeping track of many
+-- variables and methods
+Class = require 'class'
+
 -- Set the dimensions of the window
 WINDOW_WIDTH = 1280
 WINDOW_HEIGHT = 720
