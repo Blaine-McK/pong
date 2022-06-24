@@ -16,7 +16,7 @@ function Paddle:init(x, y, width, height)
     self.x = x
     self.y = y
     self.width = width
-    self.heigh = height
+    self.height = height
     self.dy = 0
 end
 
@@ -30,7 +30,7 @@ function Paddle:update(dt)
     -- We use math.min to ensure that we don't go further than the bottom of
     -- screen minus the paddle's height.
     else
-        self.y math.min(VIRTUAL_HEIGHT - self.height, self.y + self.dy * dt)
+        self.y = math.min(VIRTUAL_HEIGHT - self.height, self.y + self.dy * dt)
     end
 end
 
@@ -39,6 +39,6 @@ end
     function, which takes a draw mode, and the position and dimensions of the shape.
     To change the colour, love.graphics.setColor must be called.
 ]]
-function Paddle.render()
+function Paddle:render()
     love.graphics.rectangle('fill', self.x, self.y, self.width, self.height)
 end

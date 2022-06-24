@@ -12,8 +12,8 @@ function Ball:init(x, y, width, height)
     self.width = width
 
     -- The velocity of the ball on both the x and y axis
-    self.dx = 0
-    self.dy = 0
+    self.dx = math.random(2) == 1 and -100 or 100
+    self.dy = math.random(-50, 50)
 end
 
 -- Collision detection, takes a paddle as an argument and will
@@ -39,8 +39,8 @@ end
 function Ball:reset()
     self.x = VIRTUAL_WIDTH / 2 - 2
     self.y = VIRTUAL_HEIGHT / 2 - 2
-    self.dx = 0
-    self.dy = 0
+    self.dx = math.random(2) == 1 and -100 or 100
+    self.dy = math.random(-50, 50)
 end
 
 function Ball:update(dt)

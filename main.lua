@@ -6,6 +6,13 @@ push = require 'push'
 -- variables and methods
 Class = require 'class'
 
+-- Include our paddle class, has the position and dimensions for each paddle,
+-- also responsibile for rendering them.
+require 'Paddle'
+
+-- Include our ball class, has the position, dimensions and velocity for the ball
+require 'Ball'
+
 -- Set the dimensions of the window
 WINDOW_WIDTH = 1280
 WINDOW_HEIGHT = 720
@@ -24,14 +31,6 @@ function love.load()
     -- Seed the random number generator using current time
     math.randomseed(os.time())
 
-    -- Set player starting scores
-    player1Score = 0
-    player2Score = 0
-
-    -- Declare varibales to track paddle y pos and set starting y co-ordinates of th paddles
-    player1Y = VIRTUAL_HEIGHT / 2
-    player2Y = VIRTUAL_HEIGHT / 2
-
     -- Set the texture filtering so there is no blurring effect on fonts or textures
     love.graphics.setDefaultFilter('nearest', 'nearest')
 
@@ -45,13 +44,12 @@ function love.load()
         vsync = true
     })
 
-    -- Store ball position
-    ballX = VIRTUAL_WIDTH / 2 - 2
-    ballY = VIRTUAL_HEIGHT / 2 - 2
+    -- Initialise the player paddles
+    player1 = Paddle(10, 30, 5, 20)
+    player2 = Paddle(VIRTUAL_WIDTH -10, VIRTUAL_HEIGHT - 30, 5, 20)
 
-    -- Store ball velocity
-    ballDX = math.random(2) == 1 and 100 or -100
-    ballDY = math.random(-50, 50)
+    -- Place the ball in the center of the screen
+    ball = Ball(VIRTUAL_WIDTH / 2 - 2, VIRTUAL_HEIGHT / 2 - 2, 4, 4)
 
     -- Rudimentary state machine
     gameState = 'start'
@@ -68,13 +66,6 @@ function love.draw()
     -- Draw text at top center of screen
     -- Set the font
     love.graphics.setFont(smallFont)
-    love.graphics.printf('Hello Pong!', 0, 20, VIRTUAL_WIDTH, 'center')
-
-    -- Draw player scores
-    -- Set the font
-    love.graphics.setFont(scoreFont)
-    love.graphics.print(tostring(player1Score), VIRTUAL_WIDTH / 2 - 50, VIRTUAL_HEIGHT / 3)
-    love.graphics.print(tostring(player2Score), VIRTUAL_WIDTH / 2 + 50, VIRTUAL_HEIGHT / 3)
 
     -- Print to screen so we can see transition between states
     if gameState == 'start' then
@@ -84,9 +75,9 @@ function love.draw()
     end
 
     -- Draw the 2 player paddles and ball to the screen
-    love.graphics.rectangle('fill', 10, player1Y, 5, 20)
-    love.graphics.rectangle('fill', VIRTUAL_WIDTH - 10, player2Y, 5, 20)
-    love.graphics.rectangle('fill', ballX, ballY, 4, 4)
+    player1:render()
+    player2:render()
+    ball:render()
 
     push:apply('end')
 end
@@ -96,32 +87,29 @@ function love.update(dt)
     
     -- Player1 movement
     if love.keyboard.isDown('w') then
-        player1Y = player1Y - (PADDLE_SPEED * dt)
-        -- Prevent player1 from going off top of screen
-        player1Y = math.max(0, player1Y)
+        player1.dy = -PADDLE_SPEED
     elseif love.keyboard.isDown('s') then
-        player1Y = player1Y + (PADDLE_SPEED * dt)
-        -- Prevent player1 from going off bottom of screen
-        player1Y = math.min(VIRTUAL_HEIGHT - 20, player1Y)
+        player1.dy = PADDLE_SPEED
+    else
+        player1.dy = 0
     end
 
     -- Player2 movement
     if love.keyboard.isDown('up') then
-        player2Y = player2Y - (PADDLE_SPEED * dt)
-        -- Prevent player2 from going off top of screen
-        player2Y = math.max(0, player2Y)
+        player2.dy = -PADDLE_SPEED
     elseif love.keyboard.isDown('down') then
-        player2Y = player2Y + (PADDLE_SPEED * dt)
-        -- Prevent player2 from going off bottom of screen
-        player2Y = math.min(VIRTUAL_HEIGHT - 20, player2Y)
+        player2.dy = PADDLE_SPEED
+    else
+        player2.dy = 0
     end
 
     -- Ensure ball can only move in the 'play' state
     if gameState == 'play' then
-        ballX = ballX + ballDX * dt
-        bally = ballY + ballDY * dt
+        ball:update(dt)
     end
 
+    player1:update(dt)
+    player2:update(dt)
 end
 
 -- Add a way to quit the game by user input
@@ -136,11 +124,7 @@ function love.keypressed(key)
         else
             gameState = 'start'
 
-            ballX = VIRTUAL_WIDTH / 2 - 2
-            ballY = VIRTUAL_HEIGHT / 2 - 2
-
-            ballDX = math.random(2) == 1 and 100 or -100
-            ballDY = math.random(-50, 50) * 1.5
+            ball:reset()
         end
     end
 end
