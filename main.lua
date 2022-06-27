@@ -28,6 +28,9 @@ PADDLE_SPEED = 200
 -- Initialize the game and set resolution, use virtual resolution
 function love.load()
    
+    -- Add a title to the window for more polish
+    love.window.setTitle('Pong')
+
     -- Seed the random number generator using current time
     math.randomseed(os.time())
 
@@ -79,6 +82,9 @@ function love.draw()
     player2:render()
     ball:render()
 
+     -- Draw FPS display
+     displayFPS()
+
     push:apply('end')
 end
 
@@ -127,4 +133,11 @@ function love.keypressed(key)
             ball:reset()
         end
     end
+end
+
+-- Helper function to draw FPS to screen
+function displayFPS()
+    love.graphics.setFont(smallFont)
+    love.graphics.setColor(255, 255, 255, 255)
+    love.graphics.printf('FPS: ' .. tostring(love.timer.getFPS()), 0, 5, VIRTUAL_WIDTH, 'center')
 end
