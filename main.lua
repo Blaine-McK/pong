@@ -40,6 +40,7 @@ function love.load()
     -- create fonts and set sizes
     smallFont = love.graphics.newFont('consola.ttf', 16)
     scoreFont = love.graphics.newFont('consola.ttf', 32)
+    love.graphics.setFont(smallFont)
 
     push:setupScreen(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT, {
         fullscreen = false,
@@ -57,6 +58,74 @@ function love.load()
     -- Rudimentary state machine
     gameState = 'start'
 
+end
+
+-- Add interactivity through the update method
+function love.update(dt)
+    if gameState == 'play' then
+        -- Check for ball collision with paddle for player 1
+        if ball:collides(player1) then
+            -- Reverse the direction of the ball and slightly increase velocity
+            ball.dx = -ball.dx * 1.03
+            ball.x = player1.x + 5
+
+            -- Keep the velocity going in the same direction but randomise it
+            if ball.dy < 0 then
+                ball.dy = -math.random(10, 150)
+            else
+                ball.dy = math.random(10, 150)
+            end
+        end
+
+        -- Check for ball collision with paddle for player 2
+        if ball:collides(player2) then
+            -- Reverse the direction of the ball and slightly increase velocity
+            ball.dx = -ball.dx * 1.03
+            ball.x = player2.x - 5
+
+            -- Keep the velocity going in the same direction but randomise it
+            if ball.dy < 0 then
+                ball.dy = -math.random(10, 150)
+            else
+                ball.dy = math.random(10, 150)
+            end
+        end
+
+        -- detect upper and lower screen boundary collision and reverse
+        -- minus 4 to account for ball height
+        if ball.y < 0 or ball.y > VIRTUAL_HEIGHT - 4 then
+            ball.dy = -ball.dy
+        end
+    end
+
+    -- Player1 movement
+    if love.keyboard.isDown('w') then
+        player1.dy = -PADDLE_SPEED
+    elseif love.keyboard.isDown('s') then
+        player1.dy = PADDLE_SPEED
+    else
+        player1.dy = 0
+    end
+
+    -- Player2 movement
+    if love.keyboard.isDown('up') then
+        player2.dy = -PADDLE_SPEED
+    elseif love.keyboard.isDown('down') then
+        player2.dy = PADDLE_SPEED
+    else
+        player2.dy = 0
+    end
+
+    -- Update ball position
+    if gameState == 'play' then
+        ball:update(dt)
+    end
+
+    player1:update(dt)
+    player2:update(dt)
+
+    -- Clear table of jeys pressed as it is the end of frame
+    love.keyboard.keysPressed = {}
 end
 
 -- Draw text to the window
@@ -86,36 +155,6 @@ function love.draw()
      displayFPS()
 
     push:apply('end')
-end
-
--- Add interactivity through the update method
-function love.update(dt)
-    
-    -- Player1 movement
-    if love.keyboard.isDown('w') then
-        player1.dy = -PADDLE_SPEED
-    elseif love.keyboard.isDown('s') then
-        player1.dy = PADDLE_SPEED
-    else
-        player1.dy = 0
-    end
-
-    -- Player2 movement
-    if love.keyboard.isDown('up') then
-        player2.dy = -PADDLE_SPEED
-    elseif love.keyboard.isDown('down') then
-        player2.dy = PADDLE_SPEED
-    else
-        player2.dy = 0
-    end
-
-    -- Ensure ball can only move in the 'play' state
-    if gameState == 'play' then
-        ball:update(dt)
-    end
-
-    player1:update(dt)
-    player2:update(dt)
 end
 
 -- Add a way to quit the game by user input

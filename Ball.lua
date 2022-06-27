@@ -18,11 +18,11 @@ end
 
 -- Collision detection, takes a paddle as an argument and will
 -- return true or false depending if the pall is overlapping the paddle
-function Ball:Collides(paddle)
+function Ball:collides(paddle)
 
     -- Check to see if the left edge of either is further right than the edge of
     -- the other
-    if self.x < paddle.x + paddle.width or paddle.x > self.x + self.width then
+    if self.x > paddle.x + paddle.width or paddle.x > self.x + self.width then
         return false
     end
 
