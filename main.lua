@@ -28,6 +28,10 @@ PADDLE_SPEED = 200
 -- Initialize the game and set resolution, use virtual resolution
 function love.load()
    
+    -- Initialise score variables
+    player1Score = 0
+    player2Score = 0
+
     -- Add a title to the window for more polish
     love.window.setTitle('Pong')
 
@@ -98,6 +102,22 @@ function love.update(dt)
         end
     end
 
+    -- If the ball reaches the left or right edge reset the ball and add 1 to
+    -- score
+    if ball.x < 0 then
+        ball:reset()
+        player2Score = player2Score + 1
+        servingPlayer = 1
+        gameState = 'start'
+    end
+
+    if ball.x > VIRTUAL_WIDTH then
+        ball:reset()
+        player1Score = player1Score + 1
+        servingPlayer = 2
+        gameState = 'start'
+    end
+
     -- Player1 movement
     if love.keyboard.isDown('w') then
         player1.dy = -PADDLE_SPEED
@@ -138,6 +158,11 @@ function love.draw()
     -- Draw text at top center of screen
     -- Set the font
     love.graphics.setFont(smallFont)
+
+    -- Draw the score on the left and right centre of the screen
+    love.graphics.setFont(scoreFont)
+    love.graphics.print(tostring(player1Score), VIRTUAL_WIDTH / 2 - 50, VIRTUAL_HEIGHT / 3)
+    love.graphics.print(tostring(player2Score), VIRTUAL_WIDTH / 2 + 50, VIRTUAL_HEIGHT / 3)
 
     -- Print to screen so we can see transition between states
     if gameState == 'start' then
