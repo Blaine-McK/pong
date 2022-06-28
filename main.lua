@@ -32,6 +32,9 @@ function love.load()
     player1Score = 0
     player2Score = 0
 
+    -- Initialise serving player
+    servingPlayer = 1
+
     -- Add a title to the window for more polish
     love.window.setTitle('Pong')
 
@@ -66,7 +69,16 @@ end
 
 -- Add interactivity through the update method
 function love.update(dt)
-    if gameState == 'play' then
+    -- Before beginning the play state, initialise the ball velocity depending on what
+    -- player scored last
+    if gameState == 'serve' then
+        ball.dy = math.random(-50, 50)
+        if servingPlayer == 1 then
+            ball.dx = math.random(140, 200)
+        else
+            ball.dx = -math.random(140, 200)
+        end
+    elseif gameState == 'play' then
         -- Check for ball collision with paddle for player 1
         if ball:collides(player1) then
             -- Reverse the direction of the ball and slightly increase velocity
@@ -108,14 +120,14 @@ function love.update(dt)
         ball:reset()
         player2Score = player2Score + 1
         servingPlayer = 1
-        gameState = 'start'
+        gameState = 'serve'
     end
 
     if ball.x > VIRTUAL_WIDTH then
         ball:reset()
         player1Score = player1Score + 1
         servingPlayer = 2
-        gameState = 'start'
+        gameState = 'serve'
     end
 
     -- Player1 movement
@@ -159,16 +171,18 @@ function love.draw()
     -- Set the font
     love.graphics.setFont(smallFont)
 
-    -- Draw the score on the left and right centre of the screen
-    love.graphics.setFont(scoreFont)
-    love.graphics.print(tostring(player1Score), VIRTUAL_WIDTH / 2 - 50, VIRTUAL_HEIGHT / 3)
-    love.graphics.print(tostring(player2Score), VIRTUAL_WIDTH / 2 + 50, VIRTUAL_HEIGHT / 3)
+    displayScore()
 
     -- Print to screen so we can see transition between states
     if gameState == 'start' then
-        love.graphics.printf('Start!', 0, 20, VIRTUAL_WIDTH, 'center')
-    else
-        love.graphics.printf('Play!', 0, 20, VIRTUAL_WIDTH, 'center')
+        love.graphics.setFont(smallFont)
+        love.graphics.printf('Pong', 0, 10, VIRTUAL_WIDTH, 'center')
+    elseif gameState == 'serve' then
+        love.graphics.setFont(smallFont)
+        love.graphics.printf('Player ' .. tostring(servingPlayer) .. "'s serve!", 0, 10, VIRTUAL_WIDTH, 'center')
+        love.graphics.printf('Press Enter to serve!', 0, 20, VIRTUAL_WIDTH, 'center')
+    elseif gameState == 'play' then
+        -- no UI is to be displayed in play mode
     end
 
     -- Draw the 2 player paddles and ball to the screen
@@ -190,11 +204,9 @@ function love.keypressed(key)
     -- Functionality to start game and implement ball movement
     elseif key == 'enter' or key == 'return' then
         if gameState == 'start' then
+            gameState = 'serve'
+        elseif gameState == 'serve' then
             gameState = 'play'
-        else
-            gameState = 'start'
-
-            ball:reset()
         end
     end
 end
@@ -205,3 +217,11 @@ function displayFPS()
     love.graphics.setColor(255, 255, 255, 255)
     love.graphics.printf('FPS: ' .. tostring(love.timer.getFPS()), 0, 5, VIRTUAL_WIDTH, 'center')
 end
+
+-- Draw the current socre to the screen
+function displayScore()
+    -- Draw the score on the left and right centre of the screen
+    love.graphics.setFont(scoreFont)
+    love.graphics.print(tostring(player1Score), VIRTUAL_WIDTH / 2 - 50, VIRTUAL_HEIGHT / 3)
+    love.graphics.print(tostring(player2Score), VIRTUAL_WIDTH / 2 + 30, VIRTUAL_HEIGHT / 3)
+end    
