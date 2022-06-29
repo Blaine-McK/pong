@@ -53,9 +53,10 @@ function love.load()
     largeFont = love.graphics.newFont('consola.ttf', 64)
     love.graphics.setFont(smallFont)
 
+    -- Initialise window with virtual resolution
     push:setupScreen(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT, {
         fullscreen = false,
-        resizable = false,
+        resizable = true,
         vsync = true
     })
 
@@ -76,6 +77,10 @@ function love.load()
     -- Rudimentary state machine
     gameState = 'start'
 
+end
+
+function love.resize(w, h)
+    push:resize(w, h)
 end
 
 -- Add interactivity through the update method
