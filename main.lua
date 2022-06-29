@@ -59,6 +59,13 @@ function love.load()
         vsync = true
     })
 
+    -- Create audio sources
+    sounds = {
+        ['paddle_hit'] = love.audio.newSource('sounds/paddle_hit.wav', 'static'),
+        ['score'] = love.audio.newSource('sounds/score.wav', 'static'),
+        ['wall_hit'] = love.audio.newSource('sounds/wall_hit.wav', 'static')
+    }
+
     -- Initialise the player paddles
     player1 = Paddle(10, 30, 5, 20)
     player2 = Paddle(VIRTUAL_WIDTH -10, VIRTUAL_HEIGHT - 30, 5, 20)
@@ -89,6 +96,9 @@ function love.update(dt)
             ball.dx = -ball.dx * 1.03
             ball.x = player1.x + 5
 
+            -- Play sounds effect
+            sounds['paddle_hit']:play()
+
             -- Keep the velocity going in the same direction but randomise it
             if ball.dy < 0 then
                 ball.dy = -math.random(10, 150)
@@ -103,6 +113,9 @@ function love.update(dt)
             ball.dx = -ball.dx * 1.03
             ball.x = player2.x - 5
 
+            -- Play sounds effect
+            sounds['paddle_hit']:play()
+
             -- Keep the velocity going in the same direction but randomise it
             if ball.dy < 0 then
                 ball.dy = -math.random(10, 150)
@@ -115,6 +128,8 @@ function love.update(dt)
         -- minus 4 to account for ball height
         if ball.y < 0 or ball.y > VIRTUAL_HEIGHT - 4 then
             ball.dy = -ball.dy
+            -- Play sounds effect
+            sounds['wall_hit']:play()
         end
 
         -- If the ball reaches the left or right edge reset the ball and add 1 to
@@ -122,6 +137,9 @@ function love.update(dt)
         if ball.x < 0 then
             player2Score = player2Score + 1
             servingPlayer = 1
+
+            -- Play sounds effect
+            sounds['score']:play()
 
             -- Check to see if the score limit has been reached
             -- If it has enter the 'done' game state
@@ -137,6 +155,10 @@ function love.update(dt)
         if ball.x > VIRTUAL_WIDTH then
             player1Score = player1Score + 1
             servingPlayer = 2
+
+            -- Play sounds effect
+            sounds['score']:play()
+
             -- Check to see if the score limit has been reached
             -- If it has enter the 'done' game state
             if player1Score == 10 then
